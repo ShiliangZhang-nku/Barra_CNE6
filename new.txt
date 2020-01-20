@@ -1,0 +1,29 @@
+滚动回归部分考虑更换为标准库statsmodels内的RollingOLS类，对应版本：0.11
+
+安装地址：
+https://github.com/statsmodels/statsmodels/releases/tag/v0.11.0rc2
+
+实例代码：
+
+import time
+import numpy as np
+stock_count = 4000
+days = 3000
+window = 30
+from multiprocessing import Pool
+
+def rolling_reg(d):
+    X = d[:, :-1]
+    Y = d[:, -1]
+    from statsmodels.regression.rolling import RollingOLS
+    result = RollingOLS(Y, X, window).fit()
+    return result.params
+
+
+if __name__ == '__main__':
+  st = time.time()
+  with Pool() as p:
+     results = p.map(rolling_reg, np.random.rand(stock_count, days, 11))
+  print('滚动：%ss' % (time.time() - st))
+
+
